@@ -2,7 +2,7 @@ import { connectToDatabase } from "@/lib/mongoose";
 import Crime, { ICrime } from "../models/crime";
 import { Collection } from "mongoose";
 
-const AllData = async () => {
+const propertyData = async () => {
   // Connect to the database and fetch data
 
   await fetch("http://localhost:3000/api/crime");
@@ -12,7 +12,7 @@ const AllData = async () => {
     // Access the `property_crimes` collection
     const db = Crime.db;
     const crimes = await db.collection("property_crimes").find().toArray();
-    
+
   return (
     <div>
       <h1>All Crime Data</h1>
@@ -29,4 +29,4 @@ const AllData = async () => {
   );
 };
 
-export default AllData;
+export default propertyData;

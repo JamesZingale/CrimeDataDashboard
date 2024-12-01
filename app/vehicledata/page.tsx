@@ -1,26 +1,40 @@
-import { connectToDatabase } from "@/lib/mongoose";
-import Crime, { ICrime } from "../models/crime";
-import { Collection } from "mongoose";
+'use client';
 
-const AllData = async () => {
-  // Connect to the database and fetch data
+import { useState, useEffect } from "react";
+import CrimeCard from "../components/CrimeCard";
+import { ICrime } from "../models/crime";
 
-  await fetch("http://localhost:3000/api/crime");
+const PropertyData = () => {
+  const [crimes, setCrimes] = useState<Omit<ICrime, "_id">[]>([]);
 
-  await connectToDatabase();
+  useEffect(() => {
+    // Fetch data from the API route when the component mounts
+    const fetchCrimes = async () => {
+      const response = await fetch('/api/crime?collection=property_crimes'); // Request the property crimes collection
+      if (response.ok) {
+        const data = await response.json();
+        setCrimes(data.data); // Set crimes to the state from API response
+      }
+    };
 
-    // Access the `property_crimes` collection
-    const db = Crime.db;
-    const crimes = await db.collection("vehicle_crimes").find().toArray();
-    
+    fetchCrimes();
+  }, []); // Empty dependency array means it runs once when the component mounts
+
+  const filterCrimes = () => {
+    // Example filter: Only show crimes that contain the keyword "robbery"
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.area.toLowerCase().includes("06")
+    );
+      setCrimes(filteredCrimes); // Update the crimes state with filtered data
+  };
+
   return (
     <div>
-      <h1>All Crime Data</h1>
+      <h1>Property Crime Data</h1>
+      <button onClick={filterCrimes}>Filter Robbery Crimes</button>
       {crimes.length > 0 ? (
         crimes.map((crime) => (
-          <div key={crime.dr_no}>
-            <p>{crime.crm_cd_desc} - {crime.area_name}</p>
-          </div>
+          <CrimeCard key={crime.dr_no} crime={crime} />
         ))
       ) : (
         <p>No crime data available.</p>
@@ -29,4 +43,4 @@ const AllData = async () => {
   );
 };
 
-export default AllData;
+export default PropertyData;
