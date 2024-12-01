@@ -2,17 +2,16 @@ import { connectToDatabase } from "@/lib/mongoose";
 import Crime, { ICrime } from "../../models/crime";
 import { NextResponse, NextRequest } from "next/server";
 
-
-
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  const url = new URL(request.url);
-  const collectionName = url.searchParams.get("collection") || "all_crimes";  // Default to 'all_crimes' if no collection is specified
-
   try {
     // Connect to the MongoDB database
     await connectToDatabase();
 
-    // Fetch crime data from the third-party API
+    const existingCount = await Crime.countDocuments({});
+
+    if(existingCount == 0)
+    {
+      // Fetch crime data from the third-party API
     const apiUrl = "https://data.lacity.org/resource/2nrs-mtv8.json";
     const response = await fetch(apiUrl);
 
@@ -24,9 +23,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const crimeData: Omit<ICrime, "_id">[] = await response.json();
 
     // Insert the full data into the main collection
-    const mainInsertResult = await Crime.insertMany(crimeData, { ordered: false });
+    await Crime.insertMany(crimeData, { ordered: false });
 
-    // Segregate data into different categories                                                         //these will need change
+    // Categorize data
     const vehicleCrimes = crimeData.filter((crime) =>
       crime.crm_cd_desc?.toLowerCase().includes("vehicle")
     );
@@ -34,30 +33,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       crime.crm_cd_desc?.toLowerCase().includes("robbery")
     );
 
-    // Insert categorized data into separate collections
-    const db = Crime.db; // Access the database connection
+    // Store categorized data
+    const db = Crime.db;
     await db.collection("vehicle_crimes").insertMany(vehicleCrimes, { ordered: false });
     await db.collection("property_crimes").insertMany(propertyCrimes, { ordered: false });
-
-    // Fetch data from the requested collection
-    let collectionData;
-    if (collectionName === "vehicle_crimes") {
-      collectionData = await db.collection("vehicle_crimes").find().toArray();
-    } else if (collectionName === "property_crimes") {
-      collectionData = await db.collection("property_crimes").find().toArray();
-    } else {
-      collectionData = crimeData; // Default to all crimes
     }
-
-    // Respond with success message and the requested data
-    return NextResponse.json(
-      {
-        data: collectionData
-      },
-      { status: 200 }
-    );
+    
+    return NextResponse.json({ success: true, message: "Data stored successfully" });
   } catch (error: any) {
-    console.error("Error fetching and inserting crime data:", error.message);
+    console.error("Error storing crime data:", error.message);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
