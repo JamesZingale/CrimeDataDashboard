@@ -1,5 +1,6 @@
 import React from "react";
-import { ICrime } from "../models/crime";
+import { ICrime } from "../../models/crime";
+import "./CrimeCard.css";
 
 interface CrimeCardProps {
   crime: Omit<ICrime, "_id">;
@@ -8,7 +9,9 @@ interface CrimeCardProps {
 const CrimeCard = ({ crime }: CrimeCardProps) => {
   return (
     <div className="crime-card">
-      <h3>{crime.dr_no}</h3>
+        <div>
+            {crime.dr_no}
+        </div>
       <p><strong>Date Reported:</strong> {new Date(crime.date_rptd).toLocaleDateString()}</p>
       <p><strong>Area:</strong> {crime.area}</p>
       <p><strong>Description:</strong> {crime.crm_cd_desc}</p>

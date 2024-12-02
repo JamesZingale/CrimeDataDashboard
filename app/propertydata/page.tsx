@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import CrimeCard from "../components/CrimeCard";
+import CrimeCard from "../components/CrimeCard/CrimeCard";
 import { ICrime } from "../models/crime";
 
 const propertyData = () => {
