@@ -60,7 +60,17 @@ input {
   margin-right: 20px;
   color: black;
 }
+.total-counter{
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ffffff; 
+  background-color: #1f1f1f;
+  font-size: large;
+  width: 200px;
+  height: 30px;
+  margin-right: 50px;
 
+}
 /* Optional: Style the placeholder color */
 input::placeholder {
   color: black;

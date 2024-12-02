@@ -79,6 +79,7 @@ const allData = () => {
         <button onClick={ResetData}>Reset Data</button>
         </div>
       <div className="button-container">
+      <p className="total-counter">Crimes Matched: {crimes.length}</p>
       <button onClick={filterDate}>Filter Date</button>
       <button onClick={filterArea}>Filter Area</button>
       <button onClick={filterDescription}>Filter Description</button>
