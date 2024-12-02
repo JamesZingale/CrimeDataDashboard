@@ -13,6 +13,9 @@ const CrimeCard = ({ crime }: CrimeCardProps) => {
       <p><strong>Area:</strong> {crime.area}</p>
       <p><strong>Description:</strong> {crime.crm_cd_desc}</p>
       <p><strong>Location:</strong> {crime.location}</p>
+      <p><strong>Vict Age:</strong> {crime.vict_age}</p>
+      <p><strong>Vict Sex:</strong> {crime.vict_sex}</p>
+      <p><strong>Status:</strong> {crime.status_desc}</p>
       {/* Add more details as needed */}
     </div>
   );

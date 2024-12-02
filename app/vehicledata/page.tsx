@@ -4,34 +4,89 @@ import { useState, useEffect } from "react";
 import CrimeCard from "../components/CrimeCard";
 import { ICrime } from "../models/crime";
 
-const PropertyData = () => {
+const vehicleData = () => {
   const [crimes, setCrimes] = useState<Omit<ICrime, "_id">[]>([]);
+  const [filter, setFilter] = useState<string>("");
 
   useEffect(() => {
-    // Fetch data from the API route when the component mounts
     const fetchCrimes = async () => {
-      const response = await fetch('/api/crime?collection=property_crimes'); // Request the property crimes collection
+      const response = await fetch('/api/crime?collection=vehicle_crimes'); 
       if (response.ok) {
         const data = await response.json();
-        setCrimes(data.data); // Set crimes to the state from API response
+        setCrimes(data.data); 
       }
     };
-
     fetchCrimes();
-  }, []); // Empty dependency array means it runs once when the component mounts
+  }, []); 
 
-  const filterCrimes = () => {
-    // Example filter: Only show crimes that contain the keyword "robbery"
+  const filterArea = () => {
     const filteredCrimes = crimes.filter((crime) =>
-      crime.area.toLowerCase().includes("06")
+      crime.area.toLowerCase().includes(filter.toLowerCase())
     );
-      setCrimes(filteredCrimes); // Update the crimes state with filtered data
+      setCrimes(filteredCrimes); 
+  };
+  const filterDate = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.date_rptd.includes(filter.toLowerCase())
+    );
+      setCrimes(filteredCrimes); 
+  };
+  const filterDescription = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.crm_cd_desc.toLowerCase().includes(filter.toLowerCase())
+    );
+      setCrimes(filteredCrimes); 
+  };
+  const filterLocation = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.location.toLowerCase().includes(filter.toLowerCase())
+    );
+      setCrimes(filteredCrimes); 
+  };
+  const filterVictim = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.vict_age.includes(filter)
+    );
+      setCrimes(filteredCrimes); 
+  };
+  const filterStatus = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.status_desc.toLowerCase().includes(filter.toLowerCase())
+    );
+      setCrimes(filteredCrimes); 
+  };
+
+
+  const ResetData = async () => {
+    const response = await fetch('/api/crime?clear=1&collection=vehicle_crimes'); 
+    if (response.ok) {
+      const data = await response.json();
+      setCrimes(data.data); 
+    }
   };
 
   return (
     <div>
-      <h1>Property Crime Data</h1>
-      <button onClick={filterCrimes}>Filter Robbery Crimes</button>
+      <div className="header-container">
+        <div className="header-top">
+        <h1 className="head-text">Vechile Crime Data</h1>
+        <input
+        type="text"
+        placeholder="Filter by input..."
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        />
+        <button onClick={ResetData}>Reset Data</button>
+        </div>
+      <div className="button-container">
+      <button onClick={filterDate}>Filter Date</button>
+      <button onClick={filterArea}>Filter Area</button>
+      <button onClick={filterDescription}>Filter Description</button>
+      <button onClick={filterLocation}>Filter Location</button>
+      <button onClick={filterVictim}>Filter Victim Age</button>
+      <button onClick={filterStatus}>Filter Status</button>
+      </div>
+      </div>
       {crimes.length > 0 ? (
         crimes.map((crime) => (
           <CrimeCard key={crime.dr_no} crime={crime} />
@@ -43,4 +98,4 @@ const PropertyData = () => {
   );
 };
 
-export default PropertyData;
+export default vehicleData;

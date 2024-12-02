@@ -1,22 +1,95 @@
-import { connectToDatabase } from "@/lib/mongoose";
-import Crime, { ICrime } from "../models/crime";
+'use client';
 
-const AllData = async () => {
-  // Connect to the database and fetch data
+import { useState, useEffect } from "react";
+import CrimeCard from "../components/CrimeCard";
+import { ICrime } from "../models/crime";
 
-  await fetch("http://localhost:3000/api/crime");
+const allData = () => {
+  const [crimes, setCrimes] = useState<Omit<ICrime, "_id">[]>([]);
+  const [filter, setFilter] = useState<string>("");
 
-  await connectToDatabase();
-  const crimes: Omit<ICrime, "_id">[] = await Crime.find({}); // Fetch all crime data
+  useEffect(() => {
+    const fetchCrimes = async () => {
+      const response = await fetch('/api/crime'); 
+      if (response.ok) {
+        const data = await response.json();
+        setCrimes(data.data); 
+      }
+    };
+    fetchCrimes();
+  }, []); 
+
+  const filterArea = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.area.toLowerCase().includes(filter.toLowerCase())
+    );
+      setCrimes(filteredCrimes); 
+  };
+  const filterDate = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.date_rptd.includes(filter.toLowerCase())
+    );
+      setCrimes(filteredCrimes); 
+  };
+  const filterDescription = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.crm_cd_desc.toLowerCase().includes(filter.toLowerCase())
+    );
+      setCrimes(filteredCrimes); 
+  };
+  const filterLocation = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.location.toLowerCase().includes(filter.toLowerCase())
+    );
+      setCrimes(filteredCrimes); 
+  };
+  const filterVictim = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.vict_age.includes(filter)
+    );
+      setCrimes(filteredCrimes); 
+  };
+  const filterStatus = () => {
+    const filteredCrimes = crimes.filter((crime) =>
+      crime.status_desc.toLowerCase().includes(filter.toLowerCase())
+    );
+      setCrimes(filteredCrimes); 
+  };
+
+
+  const ResetData = async () => {
+    const response = await fetch('/api/crime?clear=1'); 
+    if (response.ok) {
+      const data = await response.json();
+      setCrimes(data.data); 
+    }
+  };
 
   return (
     <div>
-      <h1>All Crime Data</h1>
+      <div className="header-container">
+        <div className="header-top">
+        <h1 className="head-text">All Crime Data</h1>
+        <input
+        type="text"
+        placeholder="Filter by input..."
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        />
+        <button onClick={ResetData}>Reset Data</button>
+        </div>
+      <div className="button-container">
+      <button onClick={filterDate}>Filter Date</button>
+      <button onClick={filterArea}>Filter Area</button>
+      <button onClick={filterDescription}>Filter Description</button>
+      <button onClick={filterLocation}>Filter Location</button>
+      <button onClick={filterVictim}>Filter Victim Age</button>
+      <button onClick={filterStatus}>Filter Status</button>
+      </div>
+      </div>
       {crimes.length > 0 ? (
         crimes.map((crime) => (
-          <div key={crime.dr_no}>
-            <p>{crime.crm_cd_desc} - {crime.area_name}</p>
-          </div>
+          <CrimeCard key={crime.dr_no} crime={crime} />
         ))
       ) : (
         <p>No crime data available.</p>
@@ -25,4 +98,4 @@ const AllData = async () => {
   );
 };
 
-export default AllData;
+export default allData;

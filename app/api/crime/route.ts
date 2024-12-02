@@ -5,6 +5,7 @@ import { NextResponse, NextRequest } from "next/server";
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const url = new URL(request.url);
   const collectionName = url.searchParams.get("collection") || "all_crimes";  // Default to 'all_crimes' if no collection is specified
+  const clear = url.searchParams.get("clear") || 0;
 
   try {
     // Connect to the MongoDB database
@@ -23,6 +24,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Access the database connection
     const db = Crime.db;
+
+    if(clear)
+      {
+        db.dropCollection("crimes");     
+        db.dropCollection("vehicle_crimes");
+        db.dropCollection("property_crimes");    
+      }
 
     // Check if the collection is empty
     let collectionData;
