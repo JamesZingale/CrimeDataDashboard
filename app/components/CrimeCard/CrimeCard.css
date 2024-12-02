@@ -1,0 +1,8 @@
+.crime-card {
+    display:block;
+    border: 2px solid #007BFF; /* Outline color */
+    border-radius: 12px; /* Rounded corners */
+    padding: 16px; /* Padding inside the card */
+    margin-bottom: 20px; /* Space between cards */
+    background-color: #0a0a0a; /* Background color */
+  }
